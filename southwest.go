@@ -9,10 +9,8 @@ import (
   "fmt"
   "net/url"
   "os"
-  "time"
   "encoding/json"
   "github.com/mattbaird/gochimp"
-  "strconv"
 )
 
 //Southwest structure
@@ -94,8 +92,8 @@ func (s *Southwest) CheckIn() (res *SouthwestResponse, err error) {
     log.Panic(err)
     return nil,err
   }
-  fmt.Printf("Status code: %s\n", resp.StatusCode)
-  fmt.Printf("Body: %s\n", string(body))
+  log.Printf("Status code: %s\n", resp.StatusCode)
+  log.Printf("Body: %s\n", string(body))
 
   res = new(SouthwestResponse)
   json.Unmarshal([]byte(string(body)), &res)
@@ -108,14 +106,12 @@ func main() {
   var lastName string
   var confirmationNumber string
   var email string
-  var startTime string
   url := "http://mobile.southwest.com/middleware/MWServlet"
   
   flag.StringVar(&firstName, "firstName", "", "First name for check in")
   flag.StringVar(&lastName, "lastName", "", "Last name for check in")
   flag.StringVar(&confirmationNumber, "confirmationNumber", "", "Confirmation Number for check in")
   flag.StringVar(&email, "email", "", "Email address to receive notifications")
-  flag.StringVar(&startTime, "start", "", "Time to start trying to checkin")
   
   flag.Parse()
   
@@ -123,13 +119,6 @@ func main() {
     log.Panic("Please ensure first name, last name and confirmation number are filled out")
     os.Exit(1)
   }
-
-  i, err := strconv.ParseInt(startTime, 10, 64)
-  if err != nil {
-    panic(err)
-  }
-  tm := time.Unix(i, 0)
-  fmt.Println(tm)
   
   s := NewSouthwest(firstName, lastName, confirmationNumber, url)
   resp, err := s.CheckIn()
